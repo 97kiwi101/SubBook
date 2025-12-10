@@ -113,7 +113,7 @@ function Dashboard({ user, setUser }) {
   return (
     <div>
       <header>
-        <div className="header-logo"><h2>PaperCut MF</h2></div>
+        <div className="header-logo"><h2>SubBook</h2></div>
         <div className="user-info">
           <span>{user.name}</span>
           <a onClick={handleLogout}>Log out</a>
@@ -199,46 +199,49 @@ function Dashboard({ user, setUser }) {
             )}
           </div>
 
-          {/* --- AVAILABLE SHIFTS --- */}
-          <h2>Available Shifts (Sub Book)</h2>
-          <div className="widget" style={{ padding: 0 }}>
-            {availableShifts.length === 0 ? <p style={{padding:'20px'}}>No shifts available.</p> : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Day</th>
-                    <th>Hours</th>
-                    <th>Job</th>
-                    <th>Reason</th> {/* New Column */}
-                    <th>Posted By</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {availableShifts.map((shift) => (
-                    shift.userid !== user.email && (
-                      <tr key={shift._id}>
-                        <td><strong>{shift.day}</strong></td>
-                        <td>
-                           {shift.hours}
-                           <div style={{fontSize:'11px', color:'#777'}}>{shift.location}</div>
-                        </td>
-                        <td>{shift.jobType}</td>
-                        {/* Display Reason if it exists */}
-                        <td style={{fontStyle:'italic', color:'#555'}}>
-                            {shift.postingReason || '--'}
-                        </td>
-                        <td>{shift.userid}</td>
-                        <td>
-                          <button className="btn-take" onClick={() => handleTakeShift(shift._id)}>Take Shift</button>
-                        </td>
-                      </tr>
-                    )
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+          {/* AVAILABLE SHIFTS */}
+<h2>Available Shifts (Sub Book)</h2>
+<div className="widget" style={{ padding: 0 }}>
+  {availableShifts.length === 0 ? <p style={{padding:'20px'}}>No shifts available.</p> : (
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Hours</th>
+          <th>Job</th>
+          <th>Reason</th>
+          <th>Posted By</th> {/* Header stays same */}
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {availableShifts.map((shift) => (
+          shift.userid !== user.email && (
+            <tr key={shift._id}>
+              <td><strong>{shift.day}</strong></td>
+              <td>
+                 {shift.hours}
+                 <div style={{fontSize:'11px', color:'#777'}}>{shift.location}</div>
+              </td>
+              <td>{shift.jobType}</td>
+              <td style={{fontStyle:'italic', color:'#555'}}>
+                  {shift.postingReason || '--'}
+              </td>
+              
+              {/* --- UPDATE THIS LINE --- */}
+              <td><strong>{shift.posterName}</strong></td> 
+              {/* ------------------------ */}
+
+              <td>
+                <button className="btn-take" onClick={() => handleTakeShift(shift._id)}>Take Shift</button>
+              </td>
+            </tr>
+          )
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
 
           {/* --- ADMIN FORM --- */}
           <h2 style={{marginTop: '40px', borderTop: '1px solid #ccc', paddingTop:'20px'}}>
