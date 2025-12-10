@@ -1,52 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const Shift = require('../models/Shift');
+const User = require('../models/User');
 
-// ... keep /available, /user/:email, and /create as they are ...
-
-// [UPDATED] POST SHIFT TO SUB BOOK (With Reason)
-router.put('/release', async (req, res) => {
-    try {
-        const { shiftId, reason } = req.body;
-        await Shift.findByIdAndUpdate(shiftId, {
-            NeedsToBeCovered: true,
-            postingReason: reason || '' // Save the reason
-        });
-        res.json({ success: true });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// [NEW] RETRACT SHIFT (Take it back)
-router.put('/retract', async (req, res) => {
-    try {
-        const { shiftId } = req.body;
-        // We set NeedsToBeCovered to false and clear the reason
-        await Shift.findByIdAndUpdate(shiftId, {
-            NeedsToBeCovered: false,
-            postingReason: '' 
-        });
-        res.json({ success: true });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// ... keep /cover as it is ...
-
-// Add this to ensure you have the full file structure
+// 1. GET ALL AVAILABLE SHIFTS (Sub Book)
 router.get('/available', async (req, res) => {
     try {
-        const shifts = await Shift.find({ NeedsToBeCovered: true });
+        const shifts = await Shift.find({ NeedsToBeCovered: true }).lean();
+        
+        // Lookup names for the "Posted By" column
+        for (const shift of shifts) {
+            const user = await User.findOne({ email: shift.userid });
+            shift.posterName = user ? user.name : shift.userid; 
+        }
+
         res.json(shifts);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
+// 2. GET MY SHIFTS (This is the one likely missing!)
 router.get('/user/:email', async (req, res) => {
     try {
+        // Find all shifts where the userid matches the email
         const shifts = await Shift.find({ userid: req.params.email });
         res.json(shifts);
     } catch (err) {
@@ -54,29 +31,90 @@ router.get('/user/:email', async (req, res) => {
     }
 });
 
+// 3. CREATE SHIFT (Admin/Test)
 router.post('/create', async (req, res) => {
     try {
         const { day, hours, location, description, jobType, userid, postedBy } = req.body;
+        
+        // Create Shift
         const newShift = new Shift({
             day, hours, location, description, jobType, userid, postedBy, NeedsToBeCovered: false
         });
         await newShift.save();
+
+        // Sync: Add ID to User's Array
+        await User.findOneAndUpdate(
+            { email: userid }, 
+            { $push: { shiftIDArray: newShift._id } }
+        );
+
         res.json({ success: true, shift: newShift });
+    } catch (err) {
+        console.error("Create Error:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 4. RELEASE SHIFT (Post to Sub Book)
+router.put('/release', async (req, res) => {
+    try {
+        const { shiftId, reason } = req.body;
+        await Shift.findByIdAndUpdate(shiftId, {
+            NeedsToBeCovered: true,
+            postingReason: reason || ''
+        });
+        res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-router.put('/cover', async (req, res) => {
+// 5. RETRACT SHIFT (Take Back)
+router.put('/retract', async (req, res) => {
     try {
-        const { shiftId, userEmail } = req.body;
+        const { shiftId } = req.body;
         await Shift.findByIdAndUpdate(shiftId, {
-            userid: userEmail,
             NeedsToBeCovered: false,
-            postingReason: '' // Clear reason once taken
+            postingReason: ''
         });
         res.json({ success: true });
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 6. COVER SHIFT (Transfer Ownership)
+router.put('/cover', async (req, res) => {
+    try {
+        const { shiftId, userEmail } = req.body; // userEmail = Person taking the shift
+
+        const shift = await Shift.findById(shiftId);
+        if (!shift) return res.status(404).json({ error: "Shift not found" });
+
+        const oldOwnerEmail = shift.userid;
+        const newOwnerEmail = userEmail;
+
+        // Sync: Remove from Old User
+        await User.findOneAndUpdate(
+            { email: oldOwnerEmail },
+            { $pull: { shiftIDArray: shift._id } }
+        );
+
+        // Sync: Add to New User
+        await User.findOneAndUpdate(
+            { email: newOwnerEmail },
+            { $push: { shiftIDArray: shift._id } }
+        );
+
+        // Update Shift
+        shift.userid = newOwnerEmail;
+        shift.NeedsToBeCovered = false;
+        shift.postingReason = '';
+        await shift.save();
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Cover Error:", err);
         res.status(500).json({ error: err.message });
     }
 });
