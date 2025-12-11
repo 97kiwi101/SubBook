@@ -1,6 +1,10 @@
-const API_URL = "http://localhost:3001/";
+// This tells Vite: "Look for the environment variable."
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const loginUser = async (credentials) => {
+  // DEBUG LOG: This will print the exact URL to your browser console
+  console.log("Attempting login at:", `${API_URL}api/auth/login`);
+
   const response = await fetch(`${API_URL}api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -18,6 +22,9 @@ export const loginUser = async (credentials) => {
 };
 
 export const registerUser = async (userData) => {
+  // DEBUG LOG: Print URL for register too
+  console.log("Attempting register at:", `${API_URL}api/auth/register`);
+
   const response = await fetch(`${API_URL}api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
