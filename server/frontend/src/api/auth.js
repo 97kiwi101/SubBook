@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_BASE_URL;
+// If the variable is missing, default to localhost:5000 (or whatever your backend port is)
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/';
 
 // Helper to handle responses safely
 const handleResponse = async (response) => {
