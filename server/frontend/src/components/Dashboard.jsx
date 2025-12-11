@@ -124,7 +124,6 @@ function Dashboard({ user, setUser }) {
         <div className="sidebar">
           <ul>
             <li><a href="#" className="active">Dashboard</a></li>
-            <li><a href="#">My Schedule</a></li>
           </ul>
         </div>
 
