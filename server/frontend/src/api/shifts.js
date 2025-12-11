@@ -1,66 +1,59 @@
-// If the variable is missing, default to localhost:5000 (or whatever your backend port is)
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/';
+const API_URL = import.meta.env.VITE_API_BASE_URL ||"http://localhost:3001/";
 
-// Helper to handle responses safely
-const handleResponse = async (response) => {
-  if (response.status === 204) return { success: true };
-  
-  if (!response.ok) {
-    const text = await response.text();
-    try {
-      const json = JSON.parse(text);
-      throw new Error(json.message || `Error ${response.status}`);
-    } catch (e) {
-      console.error("Server Error:", text);
-      throw new Error(`Server Error: ${response.status}`); // Likely 404 here
-    }
-  }
+export const getAvailableShifts = async () => {
+  // FIXED PATH: added '/shifts'
+  const response = await fetch(`${API_URL}api/shifts/available`);
+  if (!response.ok) throw new Error("Failed to fetch shifts");
   return response.json();
 };
 
-export const getAvailableShifts = async () => {
-  const response = await fetch(`${API_URL}api/available`);
-  return handleResponse(response);
-};
-
 export const getMyShifts = async (email) => {
-  const response = await fetch(`${API_URL}api/user/${email}`);
-  return handleResponse(response);
+  // FIXED PATH: added '/shifts'
+  const response = await fetch(`${API_URL}api/shifts/user/${email}`);
+  if (!response.ok) throw new Error("Failed to fetch my shifts");
+  return response.json();
 };
 
 export const createShift = async (shiftData) => {
-  // If you still get 404, check if this should be 'api/shifts/create'
-  const response = await fetch(`${API_URL}api/create`, {
+  // FIXED PATH: added '/shifts'
+  const response = await fetch(`${API_URL}api/shifts/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(shiftData),
   });
-  return handleResponse(response);
+  if (!response.ok) throw new Error("Failed to create shift");
+  return response.json();
 };
 
 export const releaseShift = async (shiftId, reason) => {
-  const response = await fetch(`${API_URL}api/release`, {
+  // FIXED PATH: added '/shifts'
+  const response = await fetch(`${API_URL}api/shifts/release`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ shiftId, reason }),
   });
-  return handleResponse(response);
+  if (!response.ok) throw new Error("Failed to release shift");
+  return response.json();
 };
 
 export const retractShift = async (shiftId) => {
-  const response = await fetch(`${API_URL}api/retract`, {
+  // FIXED PATH: added '/shifts'
+  const response = await fetch(`${API_URL}api/shifts/retract`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ shiftId }),
   });
-  return handleResponse(response);
+  if (!response.ok) throw new Error("Failed to retract shift");
+  return response.json();
 };
 
 export const coverShift = async (data) => {
-  const response = await fetch(`${API_URL}api/cover`, {
+  // FIXED PATH: added '/shifts'
+  const response = await fetch(`${API_URL}api/shifts/cover`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  return handleResponse(response);
+  if (!response.ok) throw new Error("Failed to cover shift");
+  return response.json();
 };
