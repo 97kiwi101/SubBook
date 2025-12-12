@@ -1,5 +1,4 @@
 import { useState } from 'react';
-// FIX: Add 'Link' to this import
 import { useNavigate, Link } from 'react-router-dom'; 
 import { loginUser } from '../api/auth';
 
@@ -20,11 +19,7 @@ function Login({ setUser }) {
       sessionStorage.setItem('currentUser', JSON.stringify(data.user));
       
       // 2. Update State
-      // This will trigger App.jsx to re-render.
-      // App.jsx will see "user" exists and automatically switch to the Dashboard.
       setUser(data.user);
-      
-      // REMOVED: navigate('/dashboard'); <--- This was causing the conflict!
 
     } catch (err) {
       console.error(err);

@@ -16,7 +16,6 @@ function Register({ setUser }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ... inside Register.jsx
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -27,8 +26,7 @@ function Register({ setUser }) {
       
       sessionStorage.setItem('currentUser', JSON.stringify(data.user));
       setUser(data.user);
-      
-      // REMOVED: navigate('/dashboard'); <--- Remove this
+    
 
     } catch (err) {
       console.error(err);

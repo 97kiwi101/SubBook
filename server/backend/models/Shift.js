@@ -5,9 +5,8 @@ const ShiftSchema = new mongoose.Schema({
     hours: { type: String, required: true },
     location: { type: String, default: 'Main Desk' },
     description: { type: String, default: '' },
-    jobType: { type: String, default: 'Monitor' }, // Default to Monitor
+    jobType: { type: String, default: 'Monitor' },
     
-    // NEW: Store the reason why they can't work
     postingReason: { type: String, default: '' },
 
     postedBy: String,

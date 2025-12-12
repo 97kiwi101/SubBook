@@ -8,7 +8,6 @@ router.get('/available', async (req, res) => {
     try {
         const shifts = await Shift.find({ NeedsToBeCovered: true }).lean();
         
-        // Lookup names for the "Posted By" column
         for (const shift of shifts) {
             const user = await User.findOne({ email: shift.userid });
             shift.posterName = user ? user.name : shift.userid; 
@@ -23,7 +22,7 @@ router.get('/available', async (req, res) => {
 // 2. GET MY SHIFTS (This is the one likely missing!)
 router.get('/user/:email', async (req, res) => {
     try {
-        // Find all shifts where the userid matches the email
+
         const shifts = await Shift.find({ userid: req.params.email });
         res.json(shifts);
     } catch (err) {
@@ -36,13 +35,11 @@ router.post('/create', async (req, res) => {
     try {
         const { day, hours, location, description, jobType, userid, postedBy } = req.body;
         
-        // Create Shift
         const newShift = new Shift({
             day, hours, location, description, jobType, userid, postedBy, NeedsToBeCovered: false
         });
         await newShift.save();
 
-        // Sync: Add ID to User's Array
         await User.findOneAndUpdate(
             { email: userid }, 
             { $push: { shiftIDArray: newShift._id } }
@@ -86,7 +83,7 @@ router.put('/retract', async (req, res) => {
 // 6. COVER SHIFT (Transfer Ownership)
 router.put('/cover', async (req, res) => {
     try {
-        const { shiftId, userEmail } = req.body; // userEmail = Person taking the shift
+        const { shiftId, userEmail } = req.body;
 
         const shift = await Shift.findById(shiftId);
         if (!shift) return res.status(404).json({ error: "Shift not found" });

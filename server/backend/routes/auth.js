@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const bcrypt = require('bcrypt'); // Import bcrypt
+const bcrypt = require('bcrypt'); 
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -19,7 +19,6 @@ router.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
-            // Success! Send back user info (but NEVER the password)
             res.json({ 
                 success: true, 
                 user: { 
@@ -48,12 +47,12 @@ router.post('/register', async (req, res) => {
         }
 
         // 3. Hash the password before saving
-        const saltRounds = 10; // Standard security level
+        const saltRounds = 10; 
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const newUser = new User({
             email,
-            password: hashedPassword, // Save the HASH, not the plain text
+            password: hashedPassword,
             name,
             JobArray: [jobTitle || 'Staff'],
             shiftIDArray: []

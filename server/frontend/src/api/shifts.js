@@ -19,7 +19,6 @@ export const createShift = async (shiftData) => {
   return response.json();
 };
 
-// [UPDATED] Accept reason
 export const releaseShift = async (shiftId, reason) => {
   const response = await fetch(`${API_URL}api/release`, {
     method: 'PUT',
@@ -29,7 +28,6 @@ export const releaseShift = async (shiftId, reason) => {
   return response.json();
 };
 
-// [NEW] Retract Shift
 export const retractShift = async (shiftId) => {
   const response = await fetch(`${API_URL}api/retract`, {
     method: 'PUT',

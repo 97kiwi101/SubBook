@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-// Import the new retractShift function
 import { getAvailableShifts, getMyShifts, createShift, releaseShift, retractShift, coverShift } from '../api/shifts';
 
 function Dashboard({ user, setUser }) {
@@ -12,7 +11,7 @@ function Dashboard({ user, setUser }) {
     endTime: '',
     location: '',
     description: '',
-    jobType: 'Monitor' // Default value matching the dropdown
+    jobType: 'Monitor' 
   });
 
   useEffect(() => {
@@ -82,17 +81,14 @@ function Dashboard({ user, setUser }) {
     }
   };
 
-  // [UPDATED] Post Logic with Optional Reason
   const handlePostSub = async (shiftId) => {
-    // 1. Ask for reason
     const reason = prompt("Optional: Reason for posting (e.g., Sick, Exam)?");
-    if (reason === null) return; // User clicked Cancel
+    if (reason === null) return;
 
-    await releaseShift(shiftId, reason); // Send reason to backend
+    await releaseShift(shiftId, reason);
     refreshData();
   };
 
-  // [NEW] Retract Logic
   const handleRetractSub = async (shiftId) => {
     if (!confirm('Take this shift back? It will be removed from the sub book.')) return;
     await retractShift(shiftId);
@@ -172,16 +168,14 @@ function Dashboard({ user, setUser }) {
                       </td>
                       <td>
                         {shift.NeedsToBeCovered ? (
-                          // [NEW] Button to take it back
                           <button 
                             className="btn-take" 
-                            style={{ backgroundColor: '#666' }} // Grey button for "Undo"
+                            style={{ backgroundColor: '#666' }} 
                             onClick={() => handleRetractSub(shift._id)}
                           >
                             Take Back
                           </button>
                         ) : (
-                          // Standard Post button
                           <button 
                             className="btn-take" 
                             style={{ backgroundColor: '#d9534f' }}

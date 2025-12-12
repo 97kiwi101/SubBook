@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
-import Register from './components/Register'; // Import Register
+import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 
 function App() {
